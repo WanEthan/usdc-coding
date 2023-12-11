@@ -28,7 +28,6 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
 
     result["SearchTerm"] = searchTerm
 
-    var mactchContent = {}
     // Iterate through each book
     for(const book of scannedTextObj) {
         // Iterate through each piece of scanned text in the book
@@ -36,9 +35,11 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
             // Check if the search term is found in the text (case-sensitive)
             if (content.Text.includes(searchTerm)) {
                 // Add the matched content dic to the results array
-                mactchContent["ISBN"] = book.ISBN;
-                mactchContent["Page"] = content["Page"];
-                mactchContent["Line"] = content["Line"];
+                var mactchContent = {
+                    ISBN: book.ISBN,
+                    Page: content.Page,
+                    Line: content.Line
+                }
                 result["Results"].push(mactchContent);
             }
     }
@@ -84,12 +85,34 @@ const twentyLeaguesOut = {
 }
 
 const twentyLeaguesOut2 = {
-    "SearchTerm": "by",
+    "SearchTerm": "exist",
+    "Results": [
+    ]
+}
+
+const twentyLeaguesOut3 = {
+    "SearchTerm": "The",
     "Results": [
         {
             "ISBN": "9780000528531",
             "Page": 31,
             "Line": 8
+        }
+    ]
+}
+
+const twentyLeaguesOut4 = {
+    "SearchTerm": "and",
+    "Results": [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 9
+        },
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 10
         }
     ]
 }
@@ -130,13 +153,32 @@ if (test2result.Results.length == 1) {
     console.log("Received:", test2result.Results.length);
 }
 
-/** We could choose to check that we get the matched results. */
-const test3result = findSearchTermInBooks("by", twentyLeaguesIn);
+/** Check that there is no matched result. */
+const test3result = findSearchTermInBooks("exist", twentyLeaguesIn);
 if (JSON.stringify(twentyLeaguesOut2) === JSON.stringify(test3result)) {
     console.log("PASS: Test 3");
-    console.log(test3result) 
 } else {
     console.log("FAIL: Test 3");
-    console.log("Expected:", twentyLeaguesOut2.Results.length);
-    console.log("Received:", test3result.Results.length);
+    console.log("Expected:", twentyLeaguesOut2);
+    console.log("Received:", test3result);
+}
+
+/** Check that the search term is case-sensitive. */
+const test4result = findSearchTermInBooks("The", twentyLeaguesIn);
+if (JSON.stringify(twentyLeaguesOut3) === JSON.stringify(test4result)) {
+    console.log("PASS: Test 4");
+} else {
+    console.log("FAIL: Test 4");
+    console.log("Expected:", twentyLeaguesOut3);
+    console.log("Received:", test4result);
+}
+
+/** Check that there are multiple results. */
+const test5result = findSearchTermInBooks("and", twentyLeaguesIn);
+if (JSON.stringify(twentyLeaguesOut4) === JSON.stringify(test5result)) {
+    console.log("PASS: Test 5");
+} else {
+    console.log("FAIL: Test 5");
+    console.log("Expected:", twentyLeaguesOut3);
+    console.log("Received:", test5result);
 }
