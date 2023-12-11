@@ -25,17 +25,21 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         "SearchTerm": "",
         "Results": []
     };
+
     result["SearchTerm"] = searchTerm
-    var eachContent;
-    var dic = {}
-    for(var index = 0; index < scannedTextObj.length; index++ ) {
-        eachBook = scannedTextObj[index];
-        for (var index = 0; index < eachBook.Content.length; index++)
-            if (eachBook.Content[index]["Text"].includes(searchTerm)) {
-                dic["ISBN"] = eachBook.ISBN;
-                dic["Page"] = eachBook.Content[index]["Page"];
-                dic["Line"] = eachBook.Content[index]["Line"];
-                result["Results"].push(dic);
+
+    var mactchContent = {}
+    // Iterate through each book
+    for(const book of scannedTextObj) {
+        // Iterate through each piece of scanned text in the book
+        for (const content of book.Content)
+            // Check if the search term is found in the text (case-sensitive)
+            if (content.Text.includes(searchTerm)) {
+                // Add the matched content dic to the results array
+                mactchContent["ISBN"] = book.ISBN;
+                mactchContent["Page"] = content["Page"];
+                mactchContent["Line"] = content["Line"];
+                result["Results"].push(mactchContent);
             }
     }
     
@@ -79,13 +83,24 @@ const twentyLeaguesOut = {
     ]
 }
 
+const twentyLeaguesOut2 = {
+    "SearchTerm": "by",
+    "Results": [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 8
+        }
+    ]
+}
+
 /*
  _   _ _   _ ___ _____   _____ _____ ____ _____ ____  
 | | | | \ | |_ _|_   _| |_   _| ____/ ___|_   _/ ___| 
 | | | |  \| || |  | |     | | |  _| \___ \ | | \___ \ 
 | |_| | |\  || |  | |     | | | |___ ___) || |  ___) |
  \___/|_| \_|___| |_|     |_| |_____|____/ |_| |____/ 
-                                                      
+
  */
 
 /* We have provided two unit tests. They're really just `if` statements that 
@@ -101,8 +116,8 @@ if (JSON.stringify(twentyLeaguesOut) === JSON.stringify(test1result)) {
     console.log("PASS: Test 1");
 } else {
     console.log("FAIL: Test 1");
-    // console.log("Expected:", twentyLeaguesOut);
-    // console.log("Received:", test1result);
+    console.log("Expected:", twentyLeaguesOut);
+    console.log("Received:", test1result);
 }
 
 /** We could choose to check that we get the right number of results. */
@@ -113,4 +128,15 @@ if (test2result.Results.length == 1) {
     console.log("FAIL: Test 2");
     console.log("Expected:", twentyLeaguesOut.Results.length);
     console.log("Received:", test2result.Results.length);
+}
+
+/** We could choose to check that we get the matched results. */
+const test3result = findSearchTermInBooks("by", twentyLeaguesIn);
+if (JSON.stringify(twentyLeaguesOut2) === JSON.stringify(test3result)) {
+    console.log("PASS: Test 3");
+    console.log(test3result) 
+} else {
+    console.log("FAIL: Test 3");
+    console.log("Expected:", twentyLeaguesOut2.Results.length);
+    console.log("Received:", test3result.Results.length);
 }
