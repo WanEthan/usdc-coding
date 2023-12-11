@@ -179,6 +179,6 @@ if (JSON.stringify(twentyLeaguesOut4) === JSON.stringify(test5result)) {
     console.log("PASS: Test 5");
 } else {
     console.log("FAIL: Test 5");
-    console.log("Expected:", twentyLeaguesOut3);
+    console.log("Expected:", twentyLeaguesOut4);
     console.log("Received:", test5result);
 }
