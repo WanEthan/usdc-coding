@@ -1,23 +1,10 @@
-/** 
- * RECOMMENDATION
- * 
- * To test your code, you should open "tester.html" in a web browser.
- * You can then use the "Developer Tools" to see the JavaScript console.
- * There, you will see the results unit test execution. You are welcome
- * to run the code any way you like, but this is similar to how we will
- * run your code submission.
- * 
- * The Developer Tools in Chrome are available under the "..." menu, 
- * futher hidden under the option "More Tools." In Firefox, they are 
- * under the hamburger (three horizontal lines), also hidden under "More Tools." 
- */
-
 /**
  * Searches for matches in scanned text.
  * @param {string} searchTerm - The word or term we're searching for. 
  * @param {JSON} scannedTextObj - A JSON object representing the scanned text.
  * @returns {JSON} - Search results.
- * */ 
+ * */
+
 function findSearchTermInBooks(searchTerm, scannedTextObj) {
     /** You will need to implement your search and 
      * return the appropriate object here. */
@@ -26,25 +13,29 @@ function findSearchTermInBooks(searchTerm, scannedTextObj) {
         "Results": []
     };
 
+    // Check if scannedTextObj is an array
+    if (!Array.isArray(scannedTextObj)) {
+        throw new Error('Invalid input: scannedTextObj should be an array.');
+    }
+
     result["SearchTerm"] = searchTerm
 
     // Iterate through each book
-    for(const book of scannedTextObj) {
+    for (const book of scannedTextObj) {
         // Iterate through each piece of scanned text in the book
         for (const content of book.Content)
             // Check if the search term is found in the text (case-sensitive)
             if (content.Text.includes(searchTerm)) {
                 // Add the matched content dic to the results array
-                var mactchContent = {
+                result["Results"].push({
                     ISBN: book.ISBN,
                     Page: content.Page,
                     Line: content.Line
-                }
-                result["Results"].push(mactchContent);
+                });
             }
     }
-    
-    return result; 
+
+    return result;
 }
 
 /** Example input object. */
@@ -67,11 +58,15 @@ const twentyLeaguesIn = [
                 "Page": 31,
                 "Line": 10,
                 "Text": "eyes were, I asked myself how he had managed to see, and"
-            } 
-        ] 
+            }
+        ]
     }
 ]
-    
+
+const emptyBookObjects = []
+
+const notArray = {}
+
 /** Example output object */
 const twentyLeaguesOut = {
     "SearchTerm": "the",
@@ -84,24 +79,7 @@ const twentyLeaguesOut = {
     ]
 }
 
-const twentyLeaguesOut2 = {
-    "SearchTerm": "exist",
-    "Results": [
-    ]
-}
-
-const twentyLeaguesOut3 = {
-    "SearchTerm": "The",
-    "Results": [
-        {
-            "ISBN": "9780000528531",
-            "Page": 31,
-            "Line": 8
-        }
-    ]
-}
-
-const twentyLeaguesOut4 = {
+const matchesOutput = {
     "SearchTerm": "and",
     "Results": [
         {
@@ -116,6 +94,24 @@ const twentyLeaguesOut4 = {
         }
     ]
 }
+
+const noMatchOutput = {
+    "SearchTerm": "null",
+    "Results": [
+    ]
+}
+
+const caseSensitiveOutput = {
+    "SearchTerm": "The",
+    "Results": [
+        {
+            "ISBN": "9780000528531",
+            "Page": 31,
+            "Line": 8
+        }
+    ]
+}
+
 
 /*
  _   _ _   _ ___ _____   _____ _____ ____ _____ ____  
@@ -143,8 +139,8 @@ if (JSON.stringify(twentyLeaguesOut) === JSON.stringify(test1result)) {
     console.log("Received:", test1result);
 }
 
-/** We could choose to check that we get the right number of results. */
-const test2result = findSearchTermInBooks("the", twentyLeaguesIn); 
+// We could choose to check that we get the right number of results.
+const test2result = findSearchTermInBooks("the", twentyLeaguesIn);
 if (test2result.Results.length == 1) {
     console.log("PASS: Test 2");
 } else {
@@ -153,32 +149,59 @@ if (test2result.Results.length == 1) {
     console.log("Received:", test2result.Results.length);
 }
 
-/** Check that there is no matched result. */
-const test3result = findSearchTermInBooks("exist", twentyLeaguesIn);
-if (JSON.stringify(twentyLeaguesOut2) === JSON.stringify(test3result)) {
-    console.log("PASS: Test 3");
+// Positive tests: Check that there are multiple matches. 
+const testMatches = findSearchTermInBooks("and", twentyLeaguesIn);
+// Performs a strict equality comparison in if statement
+if (JSON.stringify(matchesOutput) === JSON.stringify(testMatches)) {
+    console.log("PASS: There are some matches");
 } else {
-    console.log("FAIL: Test 3");
-    console.log("Expected:", twentyLeaguesOut2);
-    console.log("Received:", test3result);
+    console.log("FAIL: There should have at least one or more matches");
+    console.log("Expected:", matchesOutput);
+    console.log("Received:", testMatches);
 }
 
-/** Check that the search term is case-sensitive. */
-const test4result = findSearchTermInBooks("The", twentyLeaguesIn);
-if (JSON.stringify(twentyLeaguesOut3) === JSON.stringify(test4result)) {
-    console.log("PASS: Test 4");
+// Negative tests: Check that there is no match. 
+const testNoMatch = findSearchTermInBooks("null", twentyLeaguesIn);
+// Performs a strict equality comparison in if statement
+if (JSON.stringify(noMatchOutput) === JSON.stringify(testNoMatch)) {
+    console.log("PASS: No match");
 } else {
-    console.log("FAIL: Test 4");
-    console.log("Expected:", twentyLeaguesOut3);
-    console.log("Received:", test4result);
+    console.log("FAIL: Something matched");
+    console.log("Expected:", noMatchOutput);
+    console.log("Received:", testNoMatch);
 }
 
-/** Check that there are multiple results. */
-const test5result = findSearchTermInBooks("and", twentyLeaguesIn);
-if (JSON.stringify(twentyLeaguesOut4) === JSON.stringify(test5result)) {
-    console.log("PASS: Test 5");
+// Case-sensitive tests: Check that the search term is case-sensitive.
+const testCaseSensitive = findSearchTermInBooks("The", twentyLeaguesIn);
+// Performs a strict equality comparison in if statement
+if (JSON.stringify(caseSensitiveOutput) === JSON.stringify(testCaseSensitive)) {
+    console.log("PASS: Case-sensitive");
 } else {
-    console.log("FAIL: Test 5");
-    console.log("Expected:", twentyLeaguesOut4);
-    console.log("Received:", test5result);
+    console.log("FAIL: No case-sensitive");
+    console.log("Expected:", caseSensitiveOutput);
+    console.log("Received:", testCaseSensitive);
 }
+
+// No book objects tests: Check that scannedTextObj is empty.
+const testNoBookObjects = findSearchTermInBooks("123", emptyBookObjects);
+// if not, the results should be nothing in there.
+if (testNoBookObjects.Results.length === 0) {
+    console.log("PASS: No data");
+} else {
+    console.log("FAIL: There are some book objects");
+    console.log("Expected:", emptyBookObjects);
+    console.log("Received:", testNoBookObjects.Results);
+}
+
+// Error Handing tests: Test for invalid scannedTextObj exists(not an array).
+const testInvalidScannedTextObj = () => {
+    try {
+        findSearchTermInBooks("123", notArray);
+        // If the function does not throw an error, fail the test
+        console.log("FAIL: Expected an error for invalid scannedTextObj.");
+    } catch (error) {
+        // If the function throws the expected error, pass the test
+        console.log("PASS: Threw an error for invalid scannedTextObj.");
+    }
+};
+testInvalidScannedTextObj();
